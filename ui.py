@@ -22,7 +22,7 @@ def bernstein_poly(i, n, t):
     return comb(n, i) * ( t**(n-i) ) * (1 - t)**i
 
 
-def bezier_curve(points, nTimes=1000):
+def bezierr_curve(points, nTimes=1000):
     nPoints = len(points)
     xPoints = np.array([p[0] for p in points])
     yPoints = np.array([p[1] for p in points])
@@ -116,15 +116,15 @@ class App:
         SaveImageButton.place(x=380,y=280,width=70,height=25)
         SaveImageButton["command"] = self.SaveImageButton_command
 
-        BezieCurveButton=tk.Button(root)
-        BezieCurveButton["bg"] = "#e9e9ed"
+        BezierCurveButton=tk.Button(root)
+        BezierCurveButton["bg"] = "#e9e9ed"
         ft = tkFont.Font(family='Times',size=10)
-        BezieCurveButton["font"] = ft
-        BezieCurveButton["fg"] = "#000000"
-        BezieCurveButton["justify"] = "center"
-        BezieCurveButton["text"] = "Bezie Curve"
-        BezieCurveButton.place(x=680,y=150,width=74,height=30)
-        BezieCurveButton["command"] = self.BezieCurveButton_command
+        BezierCurveButton["font"] = ft
+        BezierCurveButton["fg"] = "#000000"
+        BezierCurveButton["justify"] = "center"
+        BezierCurveButton["text"] = "Bezier Curve"
+        BezierCurveButton.place(x=680,y=150,width=74,height=30)
+        BezierCurveButton["command"] = self.BezierCurveButton_command
 
         ApplyCurveButton=tk.Button(root)
         ApplyCurveButton["bg"] = "#e9e9ed"
@@ -149,8 +149,8 @@ class App:
         root.bind('<Control-z>', self.undo) 
         self.result_img = None
         self.root = root
-        self.bezie_window_state = False
-        self.bezie_dots = []
+        self.bezier_window_state = False
+        self.bezier_dots = []
         self.saved_dots = []
 
     def undo(self,event):
@@ -196,7 +196,7 @@ class App:
         self.ResultImageLabel.image = photo
 
     def ApplyCorrection(self):
-        if self.bezie_window_state or self.saved_dots == []:
+        if self.bezier_window_state or self.saved_dots == []:
             return
 
         try:
@@ -204,7 +204,7 @@ class App:
         except:
             return
 
-        x,y = bezier_curve(self.saved_dots,256)
+        x,y = bezierr_curve(self.saved_dots,256)
 
         normlized_x = np.floor((255*(x - np.min(x))/np.ptp(x)))
         normlized_y = np.floor((255*(y - np.min(y))/np.ptp(y)))
@@ -241,73 +241,73 @@ class App:
                                 message="Image not loaded")
             return
 
-    def onBezieWindowClose(self):
-        self.bezie_window.destroy()
-        self.bezie_window_state = False
-        self.bezie_dots = []
+    def onBezierWindowClose(self):
+        self.bezier_window.destroy()
+        self.bezier_window_state = False
+        self.bezier_dots = []
         self.saved_dots = []
     
-    def BuildBezie(self):
+    def BuildBezier(self):
         points = [[0,400]]
-        for i in self.bezie_dots:
-            coord = self.bezie_canvas.coords(i)
+        for i in self.bezier_dots:
+            coord = self.bezier_canvas.coords(i)
             points.append(coord)
         points.append([400,0])
         
-        x,y = bezier_curve(points,255)
+        x,y = bezierr_curve(points,255)
 
         self.saved_dots=points
 
-        self.bezie_canvas.delete("line")
+        self.bezier_canvas.delete("line")
         for i in range(len(x)-1):
-            self.bezie_canvas.create_line(x[i],y[i],x[i+1],y[i+1],fill='white',tags='line')
+            self.bezier_canvas.create_line(x[i],y[i],x[i+1],y[i+1],fill='white',tags='line')
 
     def DeleteDot(self,event):
         canvas_item_id = event.widget.find_withtag('current')[0]
 
-        if canvas_item_id in self.bezie_dots: 
-            self.bezie_dots.remove(canvas_item_id)
+        if canvas_item_id in self.bezier_dots: 
+            self.bezier_dots.remove(canvas_item_id)
 
-        self.bezie_canvas.delete("current")
+        self.bezier_canvas.delete("current")
 
-        self.BuildBezie()
+        self.BuildBezier()
 
     def CreateDot(self,event):
         x1, y1 = (event.x - 5), (event.y - 5)
         x2, y2 = (event.x + 5), (event.y + 5)
 
-        self.bezie_dots.append(self.bezie_canvas.create_oval(x1, y1, x2, y2, fill="#ffffff"))
+        self.bezier_dots.append(self.bezier_canvas.create_oval(x1, y1, x2, y2, fill="#ffffff"))
 
-        self.bezie_canvas.tag_bind(self.bezie_dots[-1],"<Button-3>",self.DeleteDot)
-        self.bezie_canvas.tag_bind(self.bezie_dots[-1],"<B1-Motion>", self.RelocateDot)
+        self.bezier_canvas.tag_bind(self.bezier_dots[-1],"<Button-3>",self.DeleteDot)
+        self.bezier_canvas.tag_bind(self.bezier_dots[-1],"<B1-Motion>", self.RelocateDot)
 
-        self.bezie_tags+=1
+        self.bezier_tags+=1
 
-        self.BuildBezie()
+        self.BuildBezier()
 
     def RelocateDot(self, event):
         if event.x < 0 or event.x > 400 or event.y < 0 or event.y > 400:
             return
         canvas_item_id = event.widget.find_withtag('current')[0]
-        self.bezie_canvas.moveto(canvas_item_id, event.x-5, event.y-5) 
+        self.bezier_canvas.moveto(canvas_item_id, event.x-5, event.y-5) 
 
-        self.BuildBezie()
+        self.BuildBezier()
     def SaveDots(self):
-        self.bezie_window.destroy()
-        self.bezie_dots = []
-        self.bezie_window_state = False
+        self.bezier_window.destroy()
+        self.bezier_dots = []
+        self.bezier_window_state = False
     
-    def openBezieWindow(self):
+    def openBezierWindow(self):
 
-        self.bezie_window = tk.Toplevel(self.root)
+        self.bezier_window = tk.Toplevel(self.root)
 
-        self.bezie_window.title("Bezie Curve")
-        self.bezie_window.geometry("400x500")
+        self.bezier_window.title("Bezier Curve")
+        self.bezier_window.geometry("400x500")
         
-        self.bezie_tags = 0
-        self.bezie_dots = []
+        self.bezier_tags = 0
+        self.bezier_dots = []
 
-        OKButton=tk.Button(self.bezie_window)
+        OKButton=tk.Button(self.bezier_window)
         OKButton["bg"] = "#e9e9ed"
         ft = tkFont.Font(family='Times',size=10)
         OKButton["font"] = ft
@@ -317,7 +317,7 @@ class App:
         OKButton.place(x=100,y=450,width=74,height=30)
         OKButton["command"] = self.SaveDots
 
-        CancelButton=tk.Button(self.bezie_window)
+        CancelButton=tk.Button(self.bezier_window)
         CancelButton["bg"] = "#e9e9ed"
         ft = tkFont.Font(family='Times',size=10)
         CancelButton["font"] = ft
@@ -325,16 +325,16 @@ class App:
         CancelButton["justify"] = "center"
         CancelButton["text"] = "Cancel"
         CancelButton.place(x=300-74,y=450,width=74,height=30)
-        CancelButton["command"] = self.onBezieWindowClose
+        CancelButton["command"] = self.onBezierWindowClose
 
-        self.bezie_canvas = tk.Canvas(self.bezie_window,width=400,height=400)
-        self.bezie_canvas.configure(bg='black')
-        self.bezie_canvas.pack()
+        self.bezier_canvas = tk.Canvas(self.bezier_window,width=400,height=400)
+        self.bezier_canvas.configure(bg='black')
+        self.bezier_canvas.pack()
         
-        self.BuildBezie()
+        self.BuildBezier()
         
-        self.bezie_window.protocol("WM_DELETE_WINDOW", self.onBezieWindowClose)
-        self.bezie_window.bind('<Double-Button-1>',self.CreateDot)
+        self.bezier_window.protocol("WM_DELETE_WINDOW", self.onBezierWindowClose)
+        self.bezier_window.bind('<Double-Button-1>',self.CreateDot)
 
     def LoadFilterButton_command(self):
         path,file_name = self.searchForFilePath()
@@ -372,10 +372,10 @@ class App:
 
         self.UpdateResultImage()
 
-    def BezieCurveButton_command(self):
-        if not self.bezie_window_state:
-            self.bezie_window_state=True
-            self.openBezieWindow()
+    def BezierCurveButton_command(self):
+        if not self.bezier_window_state:
+            self.bezier_window_state=True
+            self.openBezierWindow()
             
     def ApplyCurveButton_command(self):
         self.ApplyCorrection()
