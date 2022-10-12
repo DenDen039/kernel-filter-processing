@@ -5,9 +5,9 @@ Firstly launch ```filters.py``` to generate default filters. After it launch ```
 ## How to add new filters
 You need to create txt file and write down matrix and post proccessing value after # symbol like this:
 ```
-6.250000000000000000e-02 1.250000000000000000e-01 6.250000000000000000e-02
-1.250000000000000000e-01 2.500000000000000000e-01 1.250000000000000000e-01
-6.250000000000000000e-02 1.250000000000000000e-01 6.250000000000000000e-02
+6.2 1.25 6.25
+1.2 2.5 1.25
+6.25 1.25 6.25
 #
 1
 ```
